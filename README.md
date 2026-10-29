@@ -4,7 +4,7 @@ A native macOS meeting notebook: microphone + Mac audio recording with no floati
 
 ## Run
 
-Requires macOS 15 or later and Xcode / Swift 6 to build. No third-party packages are required.
+Requires macOS 15 or later, Xcode / Swift 6, and Python 3 to build. The first build downloads and compiles pinned WebRTC AudioProcessing 2.1 and Abseil sources, plus Meson/Ninja build tools in a local virtual environment. Subsequent builds reuse them. WebRTC is statically linked; users do not need separate runtime packages.
 
 ```sh
 ./scripts/build-app.sh
@@ -29,6 +29,7 @@ AI processing uploads audio and transcript content to OpenAI and incurs API usag
 - Recording lifetime independent of window visibility; explicit start/stop; global Carbon shortcut without Accessibility permission.
 - SQLite transactions and FTS5 full-text search, with updates when transcripts or speaker names change.
 - Audio mixing and size-bounded M4A exports. Completed exports and transcription parts are checkpointed for retry.
+- Offline WebRTC AEC3 echo cancellation before new transcription: the aligned system track is the reference for cleaning the microphone track. Processing streams through 48 kHz mono audio in 10 ms frames with bounded memory. Original `microphone.caf` and `system.caf` files are never overwritten; a separate `microphone-aec3-v1.caf` is mixed with system audio for transcription and playback. **More → Show saved audio in Finder** opens all saved originals and derived files.
 - Speaker-labeled transcription and timestamped segments using OpenAI's Audio API.
 - Transcript-grounded summaries via the Responses API, with section-wise processing for long transcripts.
 - AI-generated meeting titles after processing, preserving manually entered names. **More → Generate AI title** also names existing meetings or explicitly regenerates a title. Title-generation errors keep the notes and original title intact.
@@ -41,7 +42,8 @@ AI processing uploads audio and transcript content to OpenAI and incurs API usag
 - This is a first local build. Compilation and automated synthetic audio/storage tests pass, but live capture with Zoom/Meet/Teams, OS permissions, screen-share appearance, and real API responses need on-device acceptance testing.
 - System audio includes **all applications** except Whale. Pause other audio sources. App-specific selection is not implemented yet.
 - macOS controls its own microphone/system-audio privacy indicators; Whale does not suppress them or guarantee invisibility during screen sharing. Unlike v0.1.0, v0.1.1 never opens a screen-capture session. Quit the old app and reopen the rebuilt app to use the new capture path. macOS may request System Audio Recording permission separately; permission naming varies by OS version.
-- Use headphones: speaker output picked up by the microphone can create echo or duplicate speech. Acoustic echo cancellation is not implemented.
+- Echo cancellation reduces speaker bleed but cannot guarantee perfect removal, especially with clipping, changing devices, or unusual acoustics. Synthetic delayed/reverberant echo and overlapping-signal tests cover the offline processor; live speakerphone acceptance testing is still needed. No changes are made to live Zoom/Meet audio. Missing or empty reference tracks skip cleanup. A processing error keeps the originals and reports a retryable failure rather than silently uploading uncleaned audio.
+- Existing completed transcripts and their playback are unchanged. New processing uses versioned exports and transcription checkpoints, so legacy pre-cleanup results cannot be reused accidentally. Original recordings remain until the meeting is explicitly deleted. Intermediate resampling files are removed on success, cancellation, or error.
 - Speaker labels identify voice clusters, not real names. Rename them manually. Long recordings are split to stay below upload limits, and speakers are intentionally scoped to each part; there is no cross-part voice matching yet.
 - Transcription is post-meeting, not live. There is no pause/resume control yet; stop and start a new recording instead.
 - OpenAI's documented `gpt-4o-transcribe-diarize` model supports `diarized_json` but is scheduled to retire on **February 26, 2027**. This initial implementation uses that supported speaker-labeling path. Before that date, migrate the provider implementation to a supported diarization service; changing to an ordinary transcription model alone will not preserve speaker labels. Model fields are configurable, but response-format compatibility is required.
@@ -55,6 +57,8 @@ Core Audio tap + AVAudioEngine microphone
                  ↓
         timestamp-aligned CAF tracks
                  ↓
+        WebRTC AEC3 cleaned microphone + original system audio
+                 ↓
         mixed, size-bounded M4A parts
                  ↓
       speaker-labeled Audio API transcript
@@ -67,6 +71,8 @@ Core Audio tap + AVAudioEngine microphone
 - `Sources/WhaleApp/AudioRecorder.swift`: audio-only capture and hardware lifecycle.
 - `Sources/WhaleCore/AudioTrackWriter.swift`: timestamp alignment and serial audio writing.
 - `Sources/WhaleCore/AudioPreparation.swift`: audio mixing, compression, and resumable manifest.
+- `Sources/WhaleCore/EchoCancellation.swift` and `Sources/WhaleAEC/`: streaming offline cleanup and a small C bridge to WebRTC AEC3.
+- `scripts/build-echo.sh`: checksum-verified native dependency build. License notices ship in `Contents/Resources/ThirdPartyNotices`.
 - `Sources/WhaleCore/AIClient.swift`: transcription/summary API boundary and decoding.
 - `Sources/WhaleCore/MeetingStore.swift`: transactional persistence and search indexing.
 - `Sources/WhaleApp/AppModel.swift`: recording and processing lifecycle.
@@ -75,6 +81,7 @@ Core Audio tap + AVAudioEngine microphone
 ## Verification
 
 ```sh
+./scripts/build-echo.sh
 swift test
 ./scripts/build-app.sh
 open dist/Whale.app --args --demo
@@ -83,6 +90,8 @@ open dist/Whale.app --args --demo
 Demo mode uses a separate temporary library with an explicitly labeled sample meeting and no audio. It does not record or send API requests automatically. Quit and reopen normally for your real library.
 
 The tests cover database reopen/search/update/delete consistency, interrupted-job recovery, transcription offsets and speaker scoping, Responses output parsing, mixed-sample-rate audio export and reuse, and empty-audio failure.
+
+Echo tests also measure delayed/reverberant echo suppression and independent local-signal retention during overlapping audio, verify original bytes remain unchanged, check short/silent/missing reference tracks and partial final frames, reject legacy export reuse, and exercise cancellation cleanup. These deterministic signal tests are not a substitute for real meeting speech tests.
 
 Before relying on Whale for a meeting:
 

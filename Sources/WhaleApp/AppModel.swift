@@ -139,14 +139,14 @@ final class AppModel: ObservableObject {
                 do {
                     working.status = .processing; working.error = nil; try update(working)
                     if !summaryOnly && !titleOnly && working.segments.isEmpty {
-                        progress = "Preparing audio…"
+                        progress = "Reducing echo and preparing audio…"
                         let folder = try store.folder(for: id)
                         let parts = try await AudioPreparation.prepare(folder: folder)
                         var segments: [Segment] = []
                         for (index, part) in parts.enumerated() {
                             try Task.checkCancellation()
                             progress = "Transcribing part \(index + 1) of \(parts.count)…"
-                            let checkpoint = folder.appendingPathComponent("transcript-\(index).json")
+                            let checkpoint = folder.appendingPathComponent("transcript-\(part.filename).json")
                             if let data = try? Data(contentsOf: checkpoint), let cached = try? JSONDecoder().decode([Segment].self, from: data) {
                                 segments += cached
                             } else {

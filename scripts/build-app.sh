@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+./scripts/build-echo.sh
 swift build -c release
 APP="$PWD/dist/Whale.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -8,6 +9,7 @@ cp .build/release/Whale "$APP/Contents/MacOS/Whale"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 # Package the SwiftPM image bundle so the installed app does not depend on the build folder.
 cp -R .build/release/Whale_WhaleApp.bundle "$APP/Contents/Resources/"
+cp -R Resources/ThirdPartyNotices "$APP/Contents/Resources/"
 # Generate standard macOS icon resolutions from the transparent source artwork.
 ICONSET="$PWD/.build/Whale.iconset"
 mkdir -p "$ICONSET"

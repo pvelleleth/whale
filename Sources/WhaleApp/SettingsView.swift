@@ -24,6 +24,8 @@ struct SettingsView: View {
                     LabeledContent("Start / stop from anywhere", value: "⌘ ⇧ R")
                     Text("No floating pill or recording notifications. Closing the window keeps recording. macOS privacy indicators remain visible. Captures your microphone and all Mac audio; headphones reduce echo.")
                         .font(.caption).foregroundStyle(.secondary)
+                    Text("Echo reduction runs on your Mac before new transcriptions. Original recordings are kept alongside the cleaned audio. Your live meeting audio is unchanged.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
                 Section("Models") {
                     TextField("Speaker-labeling model", text: $transcriptionModel)

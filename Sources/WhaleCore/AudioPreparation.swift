@@ -11,12 +11,14 @@ public enum AudioPreparation {
     public static func prepare(folder: URL) async throws -> [AudioPart] {
         let manifest = folder.appendingPathComponent("parts.json")
         if let data = try? Data(contentsOf: manifest), let parts = try? JSONDecoder().decode([AudioPart].self, from: data),
-           !parts.isEmpty, parts.allSatisfy({ FileManager.default.fileExists(atPath: folder.appendingPathComponent($0.filename).path) }) {
+           !parts.isEmpty, parts.allSatisfy({ $0.filename.hasPrefix(EchoCancellation.revision + "-part-") && FileManager.default.fileExists(atPath: folder.appendingPathComponent($0.filename).path) }) {
             return parts
         }
+        try Task.checkCancellation()
+        let microphone = try EchoCancellation.clean(folder: folder)
         let composition = AVMutableComposition()
         var inputs: [AVMutableAudioMixInputParameters] = []
-        for name in ["microphone.caf", "system.caf"] {
+        for name in [microphone, "system.caf"] {
             let url = folder.appendingPathComponent(name)
             guard FileManager.default.fileExists(atPath: url.path) else { continue }
             let asset = AVURLAsset(url: url)
@@ -37,7 +39,7 @@ public enum AudioPreparation {
         while offset < duration {
             try Task.checkCancellation()
             var length = min(1200, duration - offset)
-            let filename = "part-\(parts.count).m4a"
+            let filename = "\(EchoCancellation.revision)-part-\(parts.count).m4a"
             let url = folder.appendingPathComponent(filename)
             while true {
                 if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
