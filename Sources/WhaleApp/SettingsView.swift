@@ -5,7 +5,7 @@ struct SettingsView: View {
     @AppStorage("showMenuBar") private var showMenuBar = false
     @AppStorage("autoProcess") private var autoProcess = false
     @AppStorage("transcriptionModel") private var transcriptionModel = "gpt-4o-transcribe-diarize"
-    @AppStorage("summaryModel") private var summaryModel = "gpt-4.1-mini"
+    @AppStorage("summaryModel") private var summaryModel = "gpt-6-luna"
     @State private var key = ""
     @State private var message = ""
     var body: some View {

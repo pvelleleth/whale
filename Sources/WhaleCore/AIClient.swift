@@ -4,7 +4,7 @@ public struct AIConfiguration: Sendable {
     public var apiKey: String
     public var transcriptionModel: String
     public var summaryModel: String
-    public init(apiKey: String, transcriptionModel: String = "gpt-4o-transcribe-diarize", summaryModel: String = "gpt-4.1-mini") {
+    public init(apiKey: String, transcriptionModel: String = "gpt-4o-transcribe-diarize", summaryModel: String = "gpt-6-luna") {
         self.apiKey = apiKey; self.transcriptionModel = transcriptionModel; self.summaryModel = summaryModel
     }
 }

@@ -11,7 +11,7 @@ Requires macOS 15 or later, Xcode / Swift 6, and Python 3 to build. The first bu
 open dist/Whale.app
 ```
 
-The build creates an ad-hoc-signed app bundle. Launch the `.app`, not `swift run`, so macOS can associate permissions with Whale. For regular use, move the app to `/Applications` and keep its location stable. Developer ID signing and notarization are still needed for distribution to other users; ad-hoc rebuilds can cause permissions or Keychain access to be requested again.
+The build creates an ad-hoc-signed app bundle. Launch the `.app`, not `swift run`, so macOS can associate permissions with Whale. For regular use, move the app to `/Applications` and keep its location stable. Unnotarized distribution requires users to approve the app if macOS blocks first launch; Developer ID signing and notarization provide a smoother installation. Ad-hoc rebuilds can cause permissions or Keychain access to be requested again.
 
 1. Open Settings from the sidebar gear or `⌘,`.
 2. Add an OpenAI API key and click **Save key**. The key is stored in macOS Keychain, not the project or database. A key is not required for recording.
@@ -79,6 +79,17 @@ Core Audio tap + AVAudioEngine microphone
 - `Sources/WhaleApp/LibraryView.swift`: library, summary, transcript, and speaker editing.
 
 ## Verification
+
+### Downloadable disk image
+
+Run `./scripts/build-dmg.sh` to build a release app and a compressed, unnotarized
+DMG in `dist/`, with an Applications shortcut, installation instructions, and a
+SHA-256 checksum file. The filename includes the version and supported Mac
+architecture; a build on Apple Silicon produces an Apple Silicon download.
+Publish the DMG and checksum together and label the download as requiring macOS
+15 or later. The app uses an ad-hoc signature, not an Apple Developer ID.
+Users may need to approve it in System Settings → Privacy & Security → Open Anyway
+on first launch. Test a downloaded copy on a separate Mac before public release.
 
 ```sh
 ./scripts/build-echo.sh

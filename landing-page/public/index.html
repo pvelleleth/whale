@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f2">
+  <meta name="description" content="Whale is your invisible AI note-taker for Mac. Record in the background with no meeting bot or floating recording pill, then get transcripts and summaries. Uses your own OpenAI API key.">
+  <meta property="og:title" content="Whale — Your invisible AI note-taker for Mac.">
+  <meta property="og:description" content="No meeting bot. No floating recording pill. Whale records in the background and turns your meetings into clear notes afterward.">
+  <meta property="og:type" content="website">
+  <title>Whale — Your invisible AI note-taker for Mac.</title>
+  <link rel="icon" type="image/png" href="/assets/whale.png">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="wordmark" href="#" aria-label="Whale home"><img src="/assets/whale.png" alt="" width="46" height="46">Whale</a>
+    <nav aria-label="Main navigation">
+      <a href="#how-it-works">How it works</a>
+      <a href="#your-library">Your library</a>
+      <a href="#questions">FAQs</a>
+    </nav>
+    <a class="button button-small" href="/downloads/Whale-0.2.0-apple-silicon.dmg" download>Get Whale <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">Your <em>invisible</em><br>AI note-taker.</h1>
+        <p class="hero-description">No meeting bot. No floating recording pill. Whale records quietly in the background, then turns your conversations into transcripts, summaries, and next steps.</p>
+        <a class="button button-primary" href="/downloads/Whale-0.2.0-apple-silicon.dmg" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>Download for Mac <span class="button-tag">Free</span></a>
+        <p class="download-meta">Apple Silicon · macOS 15+ · 3 MB</p>
+        <p class="setup-note">Bring your own OpenAI API key. <a href="#install">First-time setup ↗</a></p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <span class="art-star star-one">✳</span><span class="art-star star-two">+</span>
+        <div class="floating-note note-one"><span class="mini-check">✓</span> Records in the background.</div>
+        <img class="hero-whale" src="/assets/whale.png" alt="" width="1280" height="1280" fetchpriority="high">
+        <div class="floating-note note-two"><span class="note-dots">•••</span> Transcripts and summaries.</div>
+        <span class="art-caption">quietly in the background</span>
+      </div>
+    </section>
+
+    <div class="benefit-strip wrap" aria-label="At a glance"><span><i aria-hidden="true">↗</i> No bot joining your call</span><span><i aria-hidden="true">⌘</i> No floating recording pill</span><span><i aria-hidden="true">◎</i> Records with the window closed</span></div>
+
+    <section class="preview-section wrap" aria-labelledby="preview-heading">
+      <div class="section-kicker"><p class="eyebrow">MEETING NOTES, AUTOMATICALLY</p><span>Transcripts, decisions, and action items.</span></div>
+      <h2 class="sr-only" id="preview-heading">Preview your meeting notes</h2>
+      <div class="app-preview">
+        <div class="window-top"><div class="traffic-lights" aria-hidden="true"><b></b><b></b><b></b></div><span>Whale</span><span class="sample-label">Illustrative preview</span></div>
+        <div class="app-content">
+          <aside class="app-sidebar" aria-label="Sample library">
+            <div class="app-brand"><img src="/assets/whale.png" alt="" width="40" height="40"><span>whale<small>AI meeting notes for Mac.</small></span></div>
+            <div class="sample-record"><span aria-hidden="true">●</span> New recording <kbd>⌘ ⇧ R</kbd></div>
+            <div class="sample-search"><span aria-hidden="true">⌕</span> Search your meetings</div>
+            <p class="sidebar-label">YOUR MEETINGS</p>
+            <div class="meeting-row selected"><strong>Launch planning</strong><span>Today <i>24 min</i></span></div>
+            <div class="meeting-row"><strong>Design review</strong><span>Yesterday <i>18 min</i></span></div>
+            <div class="meeting-row"><strong>Weekly team sync</strong><span>Oct 23 <i>32 min</i></span></div>
+            <div class="sidebar-bottom"><span aria-hidden="true">⌂</span> Your library, on this Mac</div>
+          </aside>
+          <div class="meeting-content">
+            <div class="meeting-meta"><span>TODAY · 24 MINUTES</span><span class="ready"><span aria-hidden="true">✓</span> Ready</span></div>
+            <h3>Launch planning</h3>
+            <div class="preview-tabs" role="tablist" aria-label="Sample meeting view"><button id="summary-tab" role="tab" aria-selected="true" aria-controls="summary-panel" tabindex="0">Summary</button><button id="transcript-tab" role="tab" aria-selected="false" aria-controls="transcript-panel" tabindex="-1">Transcript</button></div>
+            <div id="summary-panel" class="notes-panel" role="tabpanel" aria-labelledby="summary-tab" tabindex="0">
+              <p class="notes-overview">The team agreed to focus the first release on core features, improve onboarding, and invite five testers.</p>
+              <h4><span class="notes-icon" aria-hidden="true">↗</span> Decisions</h4>
+              <p class="decision">Start with the essentials. Save shared workspaces for a later release. <span class="timestamp">08:42</span></p>
+              <h4><span class="notes-icon" aria-hidden="true">☑</span> Action items</h4>
+              <div class="action-item"><span class="checkbox" aria-hidden="true"></span><span>Refine the first-run experience<small>Maya · Before Friday</small></span><span class="timestamp">12:18</span></div>
+              <div class="action-item"><span class="checkbox" aria-hidden="true"></span><span>Share the app with five testers<small>Alex · Next week</small></span><span class="timestamp">16:05</span></div>
+              <h4><span class="notes-icon" aria-hidden="true">?</span> Open questions</h4><p class="open-question">What would make someone come back for their second meeting?</p>
+            </div>
+            <div id="transcript-panel" class="notes-panel" role="tabpanel" aria-labelledby="transcript-tab" tabindex="0" hidden>
+              <p class="transcript-intro">A sample of the conversation behind the notes.</p>
+              <div class="transcript-line"><span class="timestamp">08:42</span><div><strong>Maya</strong><p>Let's keep the first release focused on the essentials. We can come back to shared workspaces later.</p></div></div>
+              <div class="transcript-line"><span class="timestamp">12:18</span><div><strong>Maya</strong><p>I'll refine the first-run experience before Friday, so it's easier to get started.</p></div></div>
+              <div class="transcript-line"><span class="timestamp">16:05</span><div><strong>Alex</strong><p>I can share the app with five testers next week. I'd love to hear what brings them back for a second meeting.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="preview-caption"><span aria-hidden="true">✦</span> Review the summary or read the full transcript.</p>
+    </section>
+
+    <section class="how-section wrap" id="how-it-works" aria-labelledby="how-title">
+      <div class="section-heading"><p class="eyebrow">HOW IT WORKS</p><h2 id="how-title">Record. Transcribe.<br>Review.</h2><p>Start recording. Close the window. Stay in the conversation.<br>Your notes will be there after the meeting.</p></div>
+      <div class="steps">
+        <article><span class="step-number">01</span><div class="step-visual shortcut"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>R</kbd></div><h3>Start with a shortcut.</h3><p>Record your microphone and Mac audio with a click or ⌘ ⇧ R. You choose when recording starts and stops.</p></article>
+        <article><span class="step-number">02</span><div class="step-visual waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>Close the window. Keep talking.</h3><p>Whale records in the background, even with its window closed. Local echo reduction helps clean up speaker bleed afterward.</p></article>
+        <article><span class="step-number">03</span><div class="step-visual tiny-notes" aria-hidden="true"><span>✓ &nbsp; The decision</span><span>✓ &nbsp; The next step</span><span>✓ &nbsp; Open questions</span></div><h3>Review your meeting notes.</h3><p>After the meeting, get a speaker-labeled transcript, decisions, action items, and open questions. Search or export your notes.</p></article>
+      </div>
+    </section>
+
+    <section class="library-section" id="your-library" aria-labelledby="library-title">
+      <div class="wrap library-inner">
+        <div class="library-copy"><p class="eyebrow">LOCAL STORAGE</p><h2 id="library-title">Your meetings.<br><em>Saved on your Mac.</em></h2><p>Your recordings and notes are saved in a searchable library on your Mac. You can use Whale without creating an account.</p><a class="text-link" href="#privacy">How your data is handled <span aria-hidden="true">↗</span></a></div>
+        <div class="library-details" id="privacy">
+          <article><span class="detail-icon" aria-hidden="true">⌂</span><div><h3>Saved locally</h3><p>Your meeting library and original recordings stay on your Mac until you delete them.</p></div></article>
+          <article><span class="detail-icon" aria-hidden="true">↗</span><div><h3>AI, with your own key</h3><p>Transcription sends audio to OpenAI. Summaries send transcript text. You use your own API key, stored in macOS Keychain.</p></div></article>
+          <article><span class="detail-icon" aria-hidden="true">≋</span><div><h3>Less echo. Originals kept.</h3><p>Echo reduction runs on your Mac before transcription. It saves a cleaned copy and keeps the original audio.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="install-section wrap" id="install" aria-labelledby="install-title">
+      <div class="install-heading"><p class="eyebrow">INSTALLATION</p><h2 id="install-title">Set up Whale.</h2><p>Install the app and configure recording and AI processing.</p><a class="text-link" href="/downloads/Whale-0.2.0-apple-silicon.dmg" download>Download Whale for free <span aria-hidden="true">↓</span></a></div>
+      <ol class="install-steps">
+        <li><div><h3>Install the app.</h3><p>Open the DMG and drag <strong>Whale</strong> into Applications.</p></div></li>
+        <li><div><h3>Open Whale on your Mac.</h3><p>Whale isn't notarized by Apple. If macOS blocks the app, try opening it, then go to <strong>System Settings → Privacy & Security → Open Anyway</strong>. <a href="https://support.apple.com/102445" target="_blank" rel="noopener noreferrer">Apple's guide ↗</a></p></div></li>
+        <li><div><h3>Add your API key and permissions.</h3><p>Add your OpenAI API key in Settings for transcripts and summaries. Allow microphone and system audio access when prompted. You're ready to record.</p></div></li>
+      </ol>
+    </section>
+
+    <section class="faq-section wrap" id="questions" aria-labelledby="faq-title">
+      <div><p class="eyebrow">FAQs</p><h2 id="faq-title">Common questions.</h2></div>
+      <div class="faq-list">
+        <details><summary>Is Whale really free?<span aria-hidden="true">+</span></summary><p>Whale is free to download and use, and always will be. AI processing requires your own OpenAI API key, and OpenAI charges your account for that usage. Recording itself doesn't require a key.</p></details>
+        <details><summary>Which Macs does it work on?<span aria-hidden="true">+</span></summary><p>This download supports Apple Silicon Macs (M-series chips) running macOS 15 or later. It doesn't include an Intel build. Check your Mac under Apple menu → About This Mac.</p></details>
+        <details><summary>What does “invisible” mean?<span aria-hidden="true">+</span></summary><p>Whale doesn't add a meeting bot or floating recording pill. Recording continues with its window closed. macOS recording indicators remain visible, and an open Whale window can appear when sharing your screen.</p></details>
+        <details><summary>Does a bot join my meeting?<span aria-hidden="true">+</span></summary><p>No. Whale records your microphone and your Mac's audio locally. It doesn't join the call as another participant. macOS recording indicators remain visible. Let other participants know you're recording.</p></details>
+        <details><summary>Is everything processed on my Mac?<span aria-hidden="true">+</span></summary><p>Recording, storage, and echo reduction happen on your Mac. Transcription uploads audio to OpenAI, and summaries send transcript content to OpenAI using your API key. The app doesn't offer a fully offline transcription mode.</p></details>
+        <details><summary>Can I use it with my usual meeting app?<span aria-hidden="true">+</span></summary><p>Whale captures system audio rather than relying on a meeting-app integration. It records all Mac audio except its own output, so pause unrelated audio before recording. Try a short test call with your setup first.</p></details>
+        <details><summary>Can I take my notes with me?<span aria-hidden="true">+</span></summary><p>Yes. Export your notes as Markdown, search your meeting library, and open the saved audio in Finder. Original recordings are kept alongside derived audio until you delete the meeting.</p></details>
+      </div>
+    </section>
+
+    <section class="closing wrap" aria-labelledby="closing-title"><img src="/assets/whale.png" alt="" width="90" height="90" loading="lazy"><p class="eyebrow">GET WHALE</p><h2 id="closing-title">AI meeting notes.<br><em>Without the meeting bot.</em></h2><a class="button button-primary" href="/downloads/Whale-0.2.0-apple-silicon.dmg" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>Download for Mac <span aria-hidden="true">↗</span></a><p class="download-meta">Free · Apple Silicon · macOS 15+</p><p class="closing-note">Your OpenAI API usage is billed separately. <a href="#install">Installation guide</a></p></section>
+  </main>
+  <footer class="wrap"><a class="wordmark" href="#"><img src="/assets/whale.png" alt="" width="34" height="34">Whale</a><span>AI meeting notes for Mac.</span><div><a href="#privacy">Your data</a><a href="/downloads/Whale-0.2.0-apple-silicon.dmg.sha256">Verify download</a><span>v0.2.0</span></div></footer>
+</body>
+</html>

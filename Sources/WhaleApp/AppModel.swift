@@ -30,6 +30,13 @@ final class AppModel: ObservableObject {
     var selected: Meeting? { meetings.first { $0.id == selection } }
 
     init() {
+        let defaults = UserDefaults.standard
+        if !defaults.bool(forKey: "didMigrateSummaryModelToGPT6Luna") {
+            if defaults.string(forKey: "summaryModel") == "gpt-4.1-mini" {
+                defaults.set("gpt-6-luna", forKey: "summaryModel")
+            }
+            defaults.set(true, forKey: "didMigrateSummaryModelToGPT6Luna")
+        }
         do {
             let demo = ProcessInfo.processInfo.arguments.contains("--demo")
             let root = demo ? FileManager.default.temporaryDirectory.appendingPathComponent("Whale-Demo") :
@@ -130,7 +137,7 @@ final class AppModel: ObservableObject {
             guard let meeting = try store.load().first(where: { $0.id == id }) else { return }
             let client = AIClient(configuration: AIConfiguration(apiKey: key,
                 transcriptionModel: UserDefaults.standard.string(forKey: "transcriptionModel") ?? "gpt-4o-transcribe-diarize",
-                summaryModel: UserDefaults.standard.string(forKey: "summaryModel") ?? "gpt-4.1-mini"))
+                summaryModel: UserDefaults.standard.string(forKey: "summaryModel") ?? "gpt-6-luna"))
             processingID = id
             processingTask = Task { [weak self] in
                 guard let self else { return }
