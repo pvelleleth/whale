@@ -1,6 +1,6 @@
 # Whale landing page
 
-A static landing page with the actual Whale 0.3.0 DMG included. No packages,
+A static landing page with the actual Whale 0.3.1 DMG included. No packages,
 API keys, build step, or backend are required for the website.
 
 ## Deploy on Vercel
@@ -23,7 +23,7 @@ accessible so downloads do not require a Vercel login.
 The download is served directly from your deployed domain:
 
 ```text
-/downloads/Whale-0.3.0-apple-silicon.dmg
+/downloads/Whale-0.3.1-apple-silicon.dmg
 ```
 
 The product and website are branded Whale. WhaleNote is the intended domain

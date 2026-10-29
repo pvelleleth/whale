@@ -80,6 +80,36 @@ final class WhaleCoreTests: XCTestCase {
         let resumed = try await AudioPreparation.prepare(folder: folder)
         XCTAssertEqual(resumed[0].filename, parts[0].filename)
     }
+    func testOversizedAudioIsSplitUsingEachExportsActualSize() async throws {
+        let folder = try temporaryFolder()
+        let format = AVAudioFormat(standardFormatWithSampleRate: 48_000, channels: 1)!
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 48_000)!
+        buffer.frameLength = buffer.frameCapacity
+        for i in 0..<48_000 {
+            buffer.floatChannelData![0][i] = Float(sin(Double(i) * 2 * .pi * 440 / 48_000) * 0.1)
+        }
+        let source = folder.appendingPathComponent("microphone.caf")
+        do {
+            let writer = try AVAudioFile(forWriting: source, settings: format.settings)
+            defer { writer.close() }
+            for _ in 0..<40 { try writer.write(from: buffer) }
+        }
+        let limit = 300_000
+        let parts = try await AudioPreparation.prepare(folder: folder, maximumPartBytes: limit)
+        XCTAssertGreaterThan(parts.count, 1)
+        var end = 0.0
+        for part in parts {
+            XCTAssertEqual(part.offset, end, accuracy: 0.001)
+            let url = folder.appendingPathComponent(part.filename)
+            XCTAssertLessThan(try Data(contentsOf: url).count, limit)
+            let duration = try await AVURLAsset(url: url).load(.duration)
+            XCTAssertEqual(duration.seconds, part.duration, accuracy: 0.1)
+            end += part.duration
+        }
+        XCTAssertEqual(end, 40, accuracy: 0.1)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: source.path))
+    }
+
     func testEmptyAudioFailsWithoutCreatingFakeTranscript() async throws {
         let folder = try temporaryFolder()
         do { _ = try await AudioPreparation.prepare(folder: folder); XCTFail("Expected empty audio failure") }

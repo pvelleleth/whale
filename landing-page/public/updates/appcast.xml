@@ -4,17 +4,17 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>Whale</title>
         <item>
-            <title>0.3.0</title>
-            <pubDate>Thu, 29 Oct 2026 02:16:28 -0400</pubDate>
+            <title>0.3.1</title>
+            <pubDate>Thu, 29 Oct 2026 14:25:50 -0400</pubDate>
             <link>https://whalenote.app</link>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <enclosure url="https://whalenote.app/downloads/Whale-0.3.0-apple-silicon.dmg" length="3983323" type="application/octet-stream" sparkle:edSignature="Mm07v6GZi4u7bnGhGmJ9XvrxZ6GS98pp8MwTBIbLMQC+D54U76zaj3fQcnTvQ4IeajX3a0t9zSLicnKINX9kBA=="></enclosure>
+            <enclosure url="https://whalenote.app/downloads/Whale-0.3.1-apple-silicon.dmg" length="3983828" type="application/octet-stream" sparkle:edSignature="sv/fW51vEEm0B3pXnBMV2CEBGEokR6WgPFQf3cLdvMWh2mY0/6V6zRKhKJBiBFCJYTYZut8FzTLTA++LhLzwCg=="></enclosure>
         </item>
     </channel>
 </rss><!-- sparkle-signatures:
-edSignature: NpdNGbaZ5Wxwx04ddB/exhukN+GMtOv7r3Ku4cMIiZsqi6EjrU2vvvXWzTcmHGZ46TmaLBTLqoX0tVzevlnpBg==
+edSignature: pPZzoUhRpSwvasMqgZilvLMfid0AYtm80dYmkq/2vOFJSYMC9PxOpkWSG6HiGOgI0k91TbzVrQ5j0JX/ywfvAg==
 length: 1145
 -->

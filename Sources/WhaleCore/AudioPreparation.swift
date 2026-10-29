@@ -9,6 +9,10 @@ public struct AudioPart: Codable, Sendable {
 /// Resumable audio preparation; raw CAF tracks remain available after every failure.
 public enum AudioPreparation {
     public static func prepare(folder: URL) async throws -> [AudioPart] {
+        try await prepare(folder: folder, maximumPartBytes: 24_000_000)
+    }
+
+    static func prepare(folder: URL, maximumPartBytes: Int) async throws -> [AudioPart] {
         let manifest = folder.appendingPathComponent("parts.json")
         if let data = try? Data(contentsOf: manifest), let parts = try? JSONDecoder().decode([AudioPart].self, from: data),
            !parts.isEmpty, parts.allSatisfy({ $0.filename.hasPrefix(EchoCancellation.revision + "-part-") && FileManager.default.fileExists(atPath: folder.appendingPathComponent($0.filename).path) }) {
@@ -49,8 +53,13 @@ public enum AudioPreparation {
                 exporter.audioMix = mix
                 exporter.timeRange = CMTimeRange(start: CMTime(seconds: offset, preferredTimescale: 48_000), duration: CMTime(seconds: length, preferredTimescale: 48_000))
                 try await exporter.export(to: url, as: .m4a)
-                let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                if size < 24_000_000 { break }
+                // URL resource values cache the first export's size even after replacing
+                // that file. Read fresh filesystem attributes for every shorter retry.
+                let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+                guard let size = attributes[.size] as? NSNumber, size.intValue > 0 else {
+                    throw WhaleError("The audio encoder produced an empty file. Try processing this meeting again.")
+                }
+                if size.intValue < maximumPartBytes { break }
                 guard length > 10 else { throw WhaleError("Could not compress this recording below the upload limit.") }
                 length /= 2
             }
