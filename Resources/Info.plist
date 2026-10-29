@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>app.whale.desktop</string>
+<key>CFBundleName</key><string>Whale</string>
+<key>CFBundleDisplayName</key><string>Whale</string>
+<key>CFBundleExecutable</key><string>Whale</string>
+<key>CFBundleIconFile</key><string>Whale</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>0.1.3</string>
+<key>CFBundleVersion</key><string>4</string>
+<key>LSMinimumSystemVersion</key><string>15.0</string>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSMicrophoneUsageDescription</key><string>Whale records your voice as part of meetings you start recording.</string>
+<key>NSAudioCaptureUsageDescription</key><string>Whale records the other side of your meetings from Mac audio.</string>
+</dict></plist>
