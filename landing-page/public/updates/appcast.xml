@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="yes"?><!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
+--><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Whale</title>
+        <item>
+            <title>0.3.0</title>
+            <pubDate>Thu, 29 Oct 2026 02:16:28 -0400</pubDate>
+            <link>https://whalenote.app</link>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://whalenote.app/downloads/Whale-0.3.0-apple-silicon.dmg" length="3983323" type="application/octet-stream" sparkle:edSignature="Mm07v6GZi4u7bnGhGmJ9XvrxZ6GS98pp8MwTBIbLMQC+D54U76zaj3fQcnTvQ4IeajX3a0t9zSLicnKINX9kBA=="></enclosure>
+        </item>
+    </channel>
+</rss><!-- sparkle-signatures:
+edSignature: NpdNGbaZ5Wxwx04ddB/exhukN+GMtOv7r3Ku4cMIiZsqi6EjrU2vvvXWzTcmHGZ46TmaLBTLqoX0tVzevlnpBg==
+length: 1145
+-->

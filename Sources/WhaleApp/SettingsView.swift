@@ -6,6 +6,7 @@ struct SettingsView: View {
     @AppStorage("autoProcess") private var autoProcess = false
     @AppStorage("transcriptionModel") private var transcriptionModel = "gpt-4o-transcribe-diarize"
     @AppStorage("summaryModel") private var summaryModel = "gpt-6-luna"
+    @ObservedObject private var updater = AppUpdater.shared
     @State private var key = ""
     @State private var message = ""
     var body: some View {
@@ -32,6 +33,11 @@ struct SettingsView: View {
                     TextField("Summary model", text: $summaryModel)
                     Text("The transcription model must support diarized_json. OpenAI has scheduled gpt-4o-transcribe-diarize retirement for February 26, 2027; the provider integration will need updating before then.")
                         .font(.caption).foregroundStyle(.secondary)
+                }
+                Section("Updates") {
+                    Toggle("Automatically download and install updates", isOn: Binding(get: { updater.automaticallyUpdates }, set: { updater.automaticallyUpdates = $0 }))
+                    Text("Updates are installed when Whale quits. Recording and processing are allowed to finish first.").font(.caption).foregroundStyle(.secondary)
+                    if let error = updater.configurationError { Text(error).font(.caption).foregroundStyle(.secondary) }
                 }
                 Section("Storage") {
                     Text("Meetings and audio are stored locally in ~/Library/Application Support/Whale. Cloud sync is not enabled. Delete a meeting to remove its local audio and notes.")

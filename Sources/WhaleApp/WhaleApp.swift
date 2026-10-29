@@ -5,17 +5,21 @@ import AppKit
 struct WhaleApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @StateObject private var model = AppModel()
+    @StateObject private var updater = AppUpdater.shared
     @AppStorage("showMenuBar") private var showMenuBar = false
 
     var body: some Scene {
         Window("Whale", id: "library") {
             LibraryView(model: model)
                 .frame(minWidth: 900, minHeight: 620)
-                .onAppear { delegate.model = model; model.installHotKey(); NSApp.applicationIconImage = WhaleBrand.mark }
+                .onAppear { delegate.model = model; updater.model = model; model.installHotKey(); NSApp.applicationIconImage = WhaleBrand.mark }
         }
         .defaultSize(width: 1160, height: 780)
         .commands {
             CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") { updater.checkForUpdates() }
+                    .disabled(!updater.canCheckForUpdates || model.isRecording || model.busy)
+                Divider()
                 Button("Settings…") { model.showingSettings = true; showLibrary() }
                     .keyboardShortcut(",")
             }

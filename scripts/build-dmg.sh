@@ -25,7 +25,7 @@ Drag Whale into Applications, then open Whale from Applications.
 If you already have Whale running, quit it before replacing the app.
 
 FIRST LAUNCH
-This beta is not notarized by Apple. If macOS blocks it because the developer
+Whale is not notarized by Apple. If macOS blocks it because the developer
 cannot be verified, first try opening Whale, then open System Settings >
 Privacy & Security and choose Open Anyway for Whale. Only approve a download
 you trust. Managed Macs may not allow this exception.

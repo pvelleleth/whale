@@ -7,6 +7,10 @@ APP="$PWD/dist/Whale.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/Whale "$APP/Contents/MacOS/Whale"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+# Preserve Sparkle's nested helpers, signatures, and framework symlinks.
+mkdir -p "$APP/Contents/Frameworks"
+SPARKLE="$PWD/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
+ditto "$SPARKLE" "$APP/Contents/Frameworks/Sparkle.framework"
 # Package the SwiftPM image bundle so the installed app does not depend on the build folder.
 cp -R .build/release/Whale_WhaleApp.bundle "$APP/Contents/Resources/"
 cp -R Resources/ThirdPartyNotices "$APP/Contents/Resources/"

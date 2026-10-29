@@ -7,9 +7,31 @@
     {
       "source": "/downloads/(.*)\\.dmg",
       "headers": [
-        { "key": "Content-Type", "value": "application/x-apple-diskimage" },
-        { "key": "Content-Disposition", "value": "attachment" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" }
+        {
+          "key": "Content-Type",
+          "value": "application/x-apple-diskimage"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/updates/appcast.xml",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/rss+xml; charset=utf-8"
+        }
       ]
     }
   ]
