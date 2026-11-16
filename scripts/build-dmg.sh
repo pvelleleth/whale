@@ -39,7 +39,8 @@ SETUP
 Allow microphone and system audio recording access when prompted.
 Recording works without an API key. To transcribe and summarize, add your own
 OpenAI API key in Settings. OpenAI API usage is billed to your OpenAI account.
-Transcription sends recorded audio to OpenAI; summaries send transcript text.
+Live transcription streams audio to OpenAI; summaries send transcript text.
+Speaker labeling runs locally. The first live recording downloads a local model.
 Echo reduction runs locally before new transcriptions and keeps original audio.
 
 Meetings are saved locally in ~/Library/Application Support/Whale.

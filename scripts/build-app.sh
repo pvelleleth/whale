@@ -13,6 +13,7 @@ SPARKLE="$PWD/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x
 ditto "$SPARKLE" "$APP/Contents/Frameworks/Sparkle.framework"
 # Package the SwiftPM image bundle so the installed app does not depend on the build folder.
 cp -R .build/release/Whale_WhaleApp.bundle "$APP/Contents/Resources/"
+cp -R .build/release/FluidAudio_FluidAudio.bundle "$APP/Contents/Resources/"
 cp -R Resources/ThirdPartyNotices "$APP/Contents/Resources/"
 # Generate standard macOS icon resolutions from the transparent source artwork.
 ICONSET="$PWD/.build/Whale.iconset"

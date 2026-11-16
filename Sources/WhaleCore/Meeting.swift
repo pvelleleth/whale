@@ -29,6 +29,8 @@ public struct Meeting: Codable, Identifiable, Sendable {
     public var speakerNames: [String: String]
     public var summary: String
     public var error: String?
+    /// nil: file transcription; false: live transcript may be incomplete; true: both streams drained.
+    public var liveTranscriptComplete: Bool?
     public init(id: UUID = UUID(), title: String, date: Date = Date(), duration: Double = 0,
                 status: MeetingStatus = .recorded, segments: [Segment] = [], summary: String = "") {
         self.id = id; self.title = title; self.date = date; self.duration = duration

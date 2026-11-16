@@ -17,12 +17,14 @@ final class AudioRecorder: @unchecked Sendable {
     private var tapFormatListener: AudioObjectPropertyListenerBlock?
     // Writer state is accessed only on writerQueue.
     private var writer: AudioTrackWriter?
+    private var liveProcessor: LiveAudioProcessor?
+    private var liveContinuation: AsyncThrowingStream<LiveAudioPacket, Error>.Continuation?
     private var failure: String?
     private var accepting = false
     var onFailure: (@Sendable (String) -> Void)?
 
     @MainActor
-    func start(folder: URL) async throws {
+    func start(folder: URL, liveAudio: AsyncThrowingStream<LiveAudioPacket, Error>.Continuation? = nil) async throws {
         guard await AVCaptureDevice.requestAccess(for: .audio) else {
             throw WhaleError("Microphone access is off. Enable Whale in System Settings → Privacy & Security → Microphone.")
         }
@@ -45,6 +47,19 @@ final class AudioRecorder: @unchecked Sendable {
             writerQueue.sync {
                 writer = AudioTrackWriter(folder: folder)
                 failure = nil; accepting = true
+                liveContinuation = liveAudio
+                if let liveAudio {
+                    do {
+                        liveProcessor = try LiveAudioProcessor { packet in
+                            switch liveAudio.yield(packet) {
+                            case .enqueued: break
+                            case .dropped: throw WhaleError("Live transcription could not keep up with the recording. Saved audio is available for recovery.")
+                            case .terminated: throw CancellationError()
+                            @unknown default: throw CancellationError()
+                            }
+                        }
+                    } catch { liveAudio.finish(throwing: error); liveContinuation = nil }
+                }
             }
             try check(AudioDeviceCreateIOProcIDWithBlock(&ioProc, aggregateID, systemQueue) { [weak self] _, inputData, inputTime, _, _ in
                 guard let self, let buffer = AVAudioPCMBuffer(pcmFormat: format, bufferListNoCopy: inputData, deallocator: nil) else { return }
@@ -70,7 +85,7 @@ final class AudioRecorder: @unchecked Sendable {
             if let failure = writerQueue.sync(execute: { self.failure }) { throw WhaleError(failure) }
         } catch {
             tearDownHardware()
-            writerQueue.sync { accepting = false; _ = writer?.finish(); writer = nil }
+            writerQueue.sync { accepting = false; _ = writer?.finish(); writer = nil; liveProcessor = nil; liveContinuation?.finish(throwing: error); liveContinuation = nil }
             throw error
         }
     }
@@ -126,6 +141,11 @@ final class AudioRecorder: @unchecked Sendable {
             guard self.accepting else { return }
             do { try self.writer?.write(owned, track: track, at: time) }
             catch { self.fail(error.localizedDescription) }
+            do { try self.liveProcessor?.append(owned, track: track, at: time) }
+            catch {
+                self.liveProcessor = nil
+                self.liveContinuation?.finish(throwing: error); self.liveContinuation = nil
+            }
         }
     }
 
@@ -145,6 +165,9 @@ final class AudioRecorder: @unchecked Sendable {
                 self.accepting = false
                 let warning = self.writer?.finish()
                 self.writer = nil
+                do { try self.liveProcessor?.finish(); self.liveContinuation?.finish() }
+                catch { self.liveContinuation?.finish(throwing: error) }
+                self.liveProcessor = nil; self.liveContinuation = nil
                 continuation.resume(returning: self.failure ?? warning)
             }
         }

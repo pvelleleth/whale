@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("showMenuBar") private var showMenuBar = false
+    @AppStorage("liveTranscription") private var liveTranscription = true
     @AppStorage("autoProcess") private var autoProcess = false
     @AppStorage("transcriptionModel") private var transcriptionModel = "gpt-4o-transcribe-diarize"
     @AppStorage("summaryModel") private var summaryModel = "gpt-6-luna"
@@ -18,20 +19,23 @@ struct SettingsView: View {
                     HStack { Button("Save key") { save() }; Text(message).font(.caption).foregroundStyle(.secondary) }
                     Text("Stored in macOS Keychain. Recording works without a key. Transcription uploads audio to OpenAI; summaries send the transcript. API usage is billed separately.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Toggle("Process automatically after recording", isOn: $autoProcess)
+                    Toggle("Transcribe live with speaker labels", isOn: $liveTranscription)
+                    Text("Streams audio to OpenAI for live text. Speaker labeling runs locally on your Mac; the model downloads once before the first live recording. OpenAI writes notes when you stop. Uses your existing API key. Speaker labels are inferred, and overlapping or uncertain voices may be unlabeled.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Toggle("Process automatically when live transcription is off", isOn: $autoProcess)
                 }
                 Section("Recording") {
                     Toggle("Show an optional menu-bar control", isOn: $showMenuBar)
                     LabeledContent("Start / stop from anywhere", value: "⌘ ⇧ R")
                     Text("No floating pill or recording notifications. Closing the window keeps recording. macOS privacy indicators remain visible. Captures your microphone and all Mac audio; headphones reduce echo.")
                         .font(.caption).foregroundStyle(.secondary)
-                    Text("Echo reduction runs on your Mac before new transcriptions. Original recordings are kept alongside the cleaned audio. Your live meeting audio is unchanged.")
+                    Text("Echo reduction runs on your Mac during live transcription and before file transcription. Original recordings are kept alongside the cleaned audio. Your live meeting audio is unchanged.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Section("Models") {
-                    TextField("Speaker-labeling model", text: $transcriptionModel)
+                    TextField("File speaker-labeling model", text: $transcriptionModel)
                     TextField("Summary model", text: $summaryModel)
-                    Text("The transcription model must support diarized_json. OpenAI has scheduled gpt-4o-transcribe-diarize retirement for February 26, 2027; the provider integration will need updating before then.")
+                    Text("Live text uses gpt-live-transcribe. Local speaker labeling uses LS-EEND (up to 10 speakers, best suited to meetings under an hour). Names can be assigned afterward. The file transcription model must support diarized_json.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Section("Updates") {
@@ -44,7 +48,7 @@ struct SettingsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }.formStyle(.grouped)
-        }.padding(24).frame(width: 620, height: 640)
+        }.padding(24).frame(width: 620, height: 740)
             .onAppear { do { key = try Keychain.load() } catch { message = error.localizedDescription } }
     }
     private func save() {

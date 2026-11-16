@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 import Foundation
 
@@ -8,13 +8,13 @@ let package = Package(
     name: "Whale",
     platforms: [.macOS(.v15)],
     products: [.executable(name: "Whale", targets: ["WhaleApp"])],
-    dependencies: [.package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.1")],
+    dependencies: [.package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.1"), .package(url: "https://github.com/FluidInference/FluidAudio.git", exact: "0.17.7", traits: [])],
     targets: [
         .target(name: "WhaleAEC", cxxSettings: [
             .define("WEBRTC_MAC"), .define("WEBRTC_POSIX"),
             .unsafeFlags(["-I", echoRoot + "/webrtc-audio-processing-2.1/webrtc", "-I", echoRoot + "/webrtc-audio-processing-2.1/subprojects/abseil-cpp-20240722.0"])
         ], linkerSettings: [.unsafeFlags(["-L", echoRoot, "-lWhaleWebRTC"])]),
-        .target(name: "WhaleCore", dependencies: ["WhaleAEC"], linkerSettings: [.linkedLibrary("sqlite3")]),
+        .target(name: "WhaleCore", dependencies: ["WhaleAEC", .product(name: "FluidAudio", package: "FluidAudio")], linkerSettings: [.linkedLibrary("sqlite3")]),
         .executableTarget(name: "WhaleApp", dependencies: ["WhaleCore", .product(name: "Sparkle", package: "Sparkle")], resources: [.process("Resources")], linkerSettings: [.unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])]),
         .testTarget(name: "WhaleCoreTests", dependencies: ["WhaleCore"])
     ],

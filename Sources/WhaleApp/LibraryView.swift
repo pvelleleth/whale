@@ -127,7 +127,7 @@ struct MeetingDetail: View {
                     Picker("View", selection: $tab) { Text("Summary").tag("Summary"); Text("Transcript").tag("Transcript") }
                         .pickerStyle(.segmented).frame(width: 230)
                     Spacer()
-                    if !meeting.segments.isEmpty {
+                    if !meeting.segments.isEmpty && meeting.status != .recording {
                         Button { model.playing ? model.stopPlayback() : model.play(meeting) } label: {
                             Image(systemName: model.playing ? "pause.fill" : "play.fill")
                         }.help("Play recording")
@@ -142,6 +142,10 @@ struct MeetingDetail: View {
                                 .disabled(model.isRecording || model.busy)
                             Button("Regenerate summary") { model.processMeeting(meeting.id, summaryOnly: true) }
                                 .disabled(model.isRecording || model.busy)
+                        }
+                        if meeting.liveTranscriptComplete != nil {
+                            Button("Re-transcribe saved audio") { model.transcribeWithSpeakerLabels(meeting.id) }
+                                .disabled(model.busy || model.isRecording)
                         }
                         Divider()
                         Button("Delete meeting…", role: .destructive) { deleting = true }
@@ -160,9 +164,12 @@ struct MeetingDetail: View {
             }
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    if meeting.status == .recording {
+                    if meeting.status == .recording && tab == "Summary" {
                         VStack(alignment: .leading, spacing: 14) {
-                            Label("Listening, without the clutter.", systemImage: "waveform").font(.title2)
+                            Label(model.liveStatus.isEmpty ? "Listening, without the clutter." : model.liveStatus, systemImage: "waveform").font(.title2)
+                            if meeting.liveTranscriptComplete != nil {
+                                Text("Open Transcript to see words as you speak. Audio is streamed to OpenAI using your API key. Speaker labeling runs on your Mac.")
+                            }
                             Text("You can close this window or hide Whale. Recording continues until you stop it with ⌘⇧R, the menu bar, or the app.")
                             Text("Microphone + all Mac audio · No video saved").font(.caption).foregroundStyle(.secondary)
                         }.padding(24).frame(maxWidth: .infinity, alignment: .leading).background(ocean.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
@@ -181,9 +188,14 @@ struct MeetingDetail: View {
                                 SummaryBlock(text: paragraph)
                             }
                         }
-                    } else if meeting.segments.isEmpty {
+                    } else if meeting.segments.isEmpty && !(meeting.status == .recording && meeting.liveTranscriptComplete != nil) {
                         ContentUnavailableView("No transcript yet", systemImage: "text.alignleft", description: Text("Process this recording to see who said what."))
                     } else {
+                        if meeting.liveTranscriptComplete != nil {
+                            Text("Live speaker labels are inferred from voices and may be revised as the conversation continues. Rename speakers to add their names.")
+                                .font(.caption).foregroundStyle(.secondary)
+                            if meeting.status == .recording { Text(model.liveStatus).foregroundStyle(ocean) }
+                        }
                         Text("Click a timestamp to listen. Click a speaker name to rename them.")
                             .font(.caption).foregroundStyle(.secondary)
                         if meeting.segments.contains(where: { $0.speaker.hasPrefix("Part ") }) {
@@ -193,22 +205,33 @@ struct MeetingDetail: View {
                         ForEach(meeting.segments) { segment in
                             HStack(alignment: .top, spacing: 18) {
                                 Button(timestamp(segment.start)) { model.play(meeting, at: segment.start) }
-                                    .font(.system(.caption, design: .monospaced)).buttonStyle(.plain).foregroundStyle(ocean).frame(width: 62, alignment: .leading)
+                                    .font(.system(.caption, design: .monospaced)).buttonStyle(.plain).foregroundStyle(ocean).frame(width: 62, alignment: .leading).disabled(meeting.status == .recording)
                                 VStack(alignment: .leading, spacing: 7) {
                                     Button(meeting.name(for: segment.speaker)) {
                                         speakerToEdit = segment.speaker; speakerName = meeting.name(for: segment.speaker)
                                     }.buttonStyle(.plain).font(.system(size: 12, weight: .semibold)).foregroundStyle(ocean)
-                                        .disabled(model.processingID == meeting.id)
+                                        .disabled(model.processingID == meeting.id || meeting.status == .recording)
                                     Text(segment.text).font(.system(size: 14)).lineSpacing(5).textSelection(.enabled)
                                 }
                             }.frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        if meeting.status == .recording {
+                            ForEach(model.livePartials) { segment in
+                                VStack(alignment: .leading, spacing: 7) {
+                                    Text(segment.speaker).font(.caption).foregroundStyle(ocean)
+                                    Text(segment.text).foregroundStyle(.secondary).textSelection(.enabled)
+                                }
+                            }
                         }
                     }
                 }.frame(maxWidth: 780, alignment: .leading).padding(32).frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .onAppear { title = meeting.title }
+        .onAppear { title = meeting.title; if meeting.status == .recording && meeting.liveTranscriptComplete != nil { tab = "Transcript" } }
         .onChange(of: meeting.title) { _, newTitle in title = newTitle }
+        .onChange(of: meeting.liveTranscriptComplete) { _, state in
+            if meeting.status == .recording && state != nil { tab = "Transcript" }
+        }
         .alert("Rename speaker", isPresented: Binding(get: { speakerToEdit != nil }, set: { if !$0 { speakerToEdit = nil } })) {
             TextField("Name", text: $speakerName)
             Button("Cancel", role: .cancel) { speakerToEdit = nil }

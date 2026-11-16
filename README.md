@@ -45,7 +45,7 @@ AI processing uploads audio and transcript content to OpenAI and incurs API usag
 - Echo cancellation reduces speaker bleed but cannot guarantee perfect removal, especially with clipping, changing devices, or unusual acoustics. Synthetic delayed/reverberant echo and overlapping-signal tests cover the offline processor; live speakerphone acceptance testing is still needed. No changes are made to live Zoom/Meet audio. Missing or empty reference tracks skip cleanup. A processing error keeps the originals and reports a retryable failure rather than silently uploading uncleaned audio.
 - Existing completed transcripts and their playback are unchanged. New processing uses versioned exports and transcription checkpoints, so legacy pre-cleanup results cannot be reused accidentally. Original recordings remain until the meeting is explicitly deleted. Intermediate resampling files are removed on success, cancellation, or error.
 - Speaker labels identify voice clusters, not real names. Rename them manually. Long recordings are split to stay below upload limits, and speakers are intentionally scoped to each part; there is no cross-part voice matching yet.
-- Transcription is post-meeting, not live. There is no pause/resume control yet; stop and start a new recording instead.
+- Live transcription is available with an OpenAI key. There is no pause/resume control yet; stop and start a new recording instead.
 - OpenAI's documented `gpt-4o-transcribe-diarize` model supports `diarized_json` but is scheduled to retire on **February 26, 2027**. This initial implementation uses that supported speaker-labeling path. Before that date, migrate the provider implementation to a supported diarization service; changing to an ordinary transcription model alone will not preserve speaker labels. Model fields are configurable, but response-format compatibility is required.
 - Summary references are timestamp text. Transcript timestamps provide playback.
 - Raw CAF files are larger than compressed audio and retained for recovery. No automatic retention policy, app-level encryption, cloud sync, automatic updates, or notarized installer yet.
@@ -118,3 +118,58 @@ Before relying on Whale for a meeting:
 - [Apple audio-only Core Audio taps](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps)
 - [OpenAI file transcription and diarization](https://developers.openai.com/api/docs/guides/speech-to-text)
 - [OpenAI text generation / Responses API](https://developers.openai.com/api/docs/guides/text)
+
+## Live transcription with local speaker labels
+
+Enable **Transcribe live with speaker labels** in Settings. Whale uses your existing
+OpenAI key for `gpt-live-transcribe`; no second provider or key is required.
+Echo-reduced microphone and Mac audio are streamed to OpenAI while a local
+LS-EEND DIHARD III model identifies speaker turns on your Mac. The first live
+recording downloads about 45 MB of model files from Hugging Face before capture
+starts. Subsequent recordings use the cached model.
+
+Speaker boundaries determine OpenAI audio commits. Each acknowledged transcript
+item is associated with its original audio interval, even when completion events
+arrive out of order. The API does not provide word timestamps: playback and speaker
+labels are turn-level. Unacknowledged text is provisional. Overlapping and uncertain
+voices are explicitly labeled; speaker numbers can be renamed to people's names.
+The local model supports up to 10 speakers and is best suited to recordings under
+an hour. Labels are inferred, not guaranteed identity recognition.
+
+Stopping flushes the local model and the remaining OpenAI turn, then starts notes
+generation from the existing transcript. It does not re-upload the whole meeting.
+Network latency and summary generation can still vary. If live transcription fails,
+original audio remains saved, partial text is marked incomplete, and **Transcribe &
+summarize** can recover the recording through the existing file transcription path.
+**More → Re-transcribe saved audio** also replaces a live transcript with a file
+transcript. Playback reads saved tracks without waiting for an export.
+
+Builds require Swift 6.2 or later. FluidAudio is pinned to 0.17.7 with its optional
+NeMo text-normalization dependency disabled. Third-party notices ship in the app.
+
+Validation includes deterministic audio-clock, out-of-order result, speaker-boundary,
+network failure, completion-timeout, and persistence tests. The opt-in on-device
+integration test generates a two-voice 24 kHz mono WAV fixture and uses the
+OpenAI key already stored in Whale's Keychain entry (never prints the key):
+
+```sh
+./scripts/test-live.sh
+```
+
+macOS may ask you to approve Keychain access for `xctest`.
+Use `WHALE_LOCAL_ONLY=1 ./scripts/test-live.sh` to benchmark local inference
+without an API call or Keychain access.
+
+On the development M1 Pro, local labeling of a 17.15-second two-voice fixture took
+0.43–0.71 seconds, with a roughly 0.02-second final flush (warm cached model).
+The full live test, including capture processing and the real OpenAI API, displayed
+text before Stop and finalized the transcript 0.95 seconds after Stop. All 27 tests
+passed. These measurements exclude summary generation and are not latency guarantees.
+
+Synthetic tests do not establish accuracy for overlapping speech, speakerphones,
+or a real Zoom/Meet/Teams meeting.
+
+References:
+- [OpenAI live transcription](https://developers.openai.com/api/docs/guides/realtime-transcription)
+- [FluidAudio LS-EEND streaming diarization](https://github.com/FluidInference/FluidAudio/blob/v0.17.7/Documentation/Diarization/LS-EEND.md)
+- [Local model card](https://huggingface.co/FluidInference/ls-eend-coreml)
